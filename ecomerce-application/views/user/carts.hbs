@@ -1,0 +1,115 @@
+<section>
+    <div class="container">
+    
+            
+        <table class="table mt-5">
+            <thead>
+                 <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">ITEMS</th>
+                    <th scope="col">NAME</th>
+                    <th scope="col">QUANTITY</th>
+                    <th scope="col">PRICE</th>
+                    
+                   
+                     <th scope="col">Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each products}}
+                <tr>
+                   
+                    <div class="product">
+                        
+                    <th scope="row">{{@index}}</th>
+
+                   
+                    <td> <img style="width:50px; height:50px;" src="/product-images/{{this.products._id}}.jpg" alt="/product-images/.jpg"></td>
+                    
+                    <td>{{this.products.name}}</td>
+                       
+                    <td>
+                     
+
+                         <button class="cart-item-count " onclick="changeQuantity('{{this._id}}','{{this.products._id}}','{{../user._id}}',-1)">-</button> 
+                         <span id="{{this.products._id}}">{{this.quantity}} </span>
+                         <button class="cart-item-count" onclick="changeQuantity('{{this._id}}','{{this.products._id}}','{{../user._id}}',1)">+</button>
+                    </td>
+                    
+                     <td>{{this.products.price}}</td>
+
+                   
+                   <td>
+                   <form action="/user/delete/{{this._id}}" method="post">
+    <input type="hidden" name="productId" value="{{this.products._id}}" >
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure to delete {{this.products.name}}?')">Remove</button>
+</form>
+
+
+                  </td>
+
+                 </tr>
+                 {{/each}}
+                
+            
+
+
+                
+             </tbody>
+         </table>
+         <hr>
+         <div>
+              <div>
+    <h5 class="float-right mr-5">TOTAL PRICE: RS.<span id="total">{{totalAmount}}</span></h5><br>
+    <a href="/place-order" class="btn btn-success float-right">Place Order</a>
+</div>
+
+         </div>
+
+  
+
+</section>
+
+   
+<script>
+function changeQuantity(cartId, productId, userId, count) {
+  event.preventDefault(); // Prevent default form submission
+
+  let quantity = parseInt(document.getElementById(productId).innerHTML);
+  count = parseInt(count);
+
+  $.ajax({
+    url: '/change-product-quantity/'+cartId,
+    data: {
+      user: userId,
+      cart: cartId,
+      products: productId,
+      count: count,
+      quantity: quantity
+    },
+    method: 'post',
+    success: (response) => {
+      if (response.removeProduct) {
+        alert("Product Removed From The Cart");
+        location.reload(); // Reload page to reflect cart changes
+      } else {
+        const updatedQuantity = quantity + count;
+        document.getElementById(productId).innerHTML = updatedQuantity; // Update quantity in UI directly
+
+        // Update the total price if provided (assuming 'total' is the element's ID)
+       // if (document.getElementById('total')) {
+         // document.getElementById('total').innerHTML = response.total;
+       // }
+      }
+    }
+  });
+}
+</script>
+
+
+   
+
+
+
+
+
